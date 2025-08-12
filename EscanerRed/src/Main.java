@@ -3,14 +3,19 @@ public class Main {
         System.out.println("Iniciando escaner de red...");
 
         RedScanner scanner = new RedScanner();
-        String ip = "10.160.25.9"; // Cambiá por una IP real de tu red local
 
-        HostInfo resultado = scanner.escanearIP(ip);
+        // Definimos rango
+        String ipInicio = "10.160.25.1";
+        String ipFin = "10.160.25.5";
 
-        System.out.println("Resultado:");
-        System.out.println("IP: " + resultado.getIp());
-        System.out.println("Nombre: " + resultado.getNombre());
-        System.out.println("Activo: " + resultado.estaActivo());
-        System.out.println("Tiempo de respuesta: " + resultado.getTiempoRespuestaMs() + " ms");
+        var resultados = scanner.escanearRango(ipInicio, ipFin);
+
+        System.out.println("\n--- RESULTADOS ---");
+        for (HostInfo host : resultados) {
+            System.out.println(host.getIp() + " | " +
+                               host.getNombre() + " | " +
+                               (host.estaActivo() ? "Activo" : "Inactivo") +
+                               " | " + host.getTiempoRespuestaMs() + " ms");
+        }
     }
 }
