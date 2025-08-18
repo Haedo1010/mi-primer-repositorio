@@ -16,6 +16,4 @@ public class HostInfo {
     public String getNombre() { return nombre; }
     public boolean estaActivo() { return activo; }
     public long getTiempoRespuestaMs() { return tiempoRespuestaMs; }
-
-    // Setters (si los necesitás más adelante)
 }

@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.List;
 
 public class RedScanner {
@@ -78,5 +80,27 @@ public class RedScanner {
         }
 
         return resultados;
+    }
+
+    public void guardarResultadosCSV(List<HostInfo> resultados, String nombreArchivo) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(nombreArchivo))) {
+            // Cabecera del archivo
+            writer.println("IP,Nombre,Activo,TiempoRespuesta(ms)");
+
+            // Datos de cada host
+            for (HostInfo host : resultados) {
+                writer.println(
+                    host.getIp() + "," +
+                    host.getNombre() + "," +
+                    (host.estaActivo() ? "Activo" : "Inactivo") + "," +
+                    host.getTiempoRespuestaMs()
+                );
+            }
+
+            System.out.println("Resultados guardados en " + nombreArchivo);
+
+        } catch (Exception e) {
+            System.out.println("Error al guardar resultados: " + e.getMessage());
+        }
     }
 }
