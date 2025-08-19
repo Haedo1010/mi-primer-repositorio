@@ -1,6 +1,9 @@
 # mi-primer-repositorio
 # Escáner de Red (Trabajo Práctico - Redes 5to 1ra ET36)
 
+## video de demostracion de uso, explicacion, y preguntas frecuentes.
+https://youtu.be/Y7HnouK2Ym8
+
 Este proyecto es una herramienta creada en Java que permite escanear un rango de direcciones IP dentro de una red local para detectar qué dispositivos están activos. Se realiza mediante comandos `ping` e intenta resolver los nombres de host.
 
 ---
@@ -32,17 +35,17 @@ Este proyecto es una herramienta creada en Java que permite escanear un rango de
 
 ---
 
-## Cómo ejecutar el programa
+## Cómo usar el programa
 
-1. Clonar el repositorio o descargar los archivos `.java`
-2. Abrir el proyecto en un IDE (recomendado IntelliJ o NetBeans)
-3. Compilar y ejecutar la clase `Main.java`
+Para usar el escáner de red, sigue estos sencillos pasos:
 
-También se puede ejecutar por terminal:
-
-```bash
-javac *.java
-java Main
+1.  **Ejecutar la aplicación**: Abre el proyecto en tu IDE (como IntelliJ o NetBeans) y ejecuta la clase `Main.java` para iniciar la interfaz.también se puede ejecutar por terminal: ```bash  javac *.java / java Main.
+2.  **Ingresar el rango de IPs**: En los campos de texto **"IP Inicio"** y **"IP Fin"**, escribe las direcciones IP que definen el rango que deseas escanear. Por ejemplo, `192.168.1.1` y `192.168.1.254`.
+3.  **Seleccionar el tiempo de espera (Timeout)**: Elige el tiempo máximo en milisegundos que el programa esperará por una respuesta de cada host.
+4.  **Iniciar el escaneo**: Haz clic en el botón **"Escanear"**. La barra de progreso en la parte inferior de la ventana comenzará a llenarse, indicando el avance del escaneo.
+5.  **Revisar los resultados**: Una vez completado el escaneo, verás una tabla con los resultados. Cada fila muestra la IP, el nombre del equipo, su estado (Activo/Inactivo) y el tiempo de respuesta. Puedes hacer clic en los encabezados de las columnas para ordenar la información.
+6.  **Guardar los resultados**: Para guardar los datos en un archivo, presiona el botón **"Guardar CSV"**. Se abrirá una ventana para que elijas dónde quieres guardar el archivo.
+7.  **Limpiar la pantalla**: Si deseas realizar un nuevo escaneo, haz clic en el botón **"Limpiar"** para borrar todos los campos y la tabla de resultados.
 
 ## Guardar resultados
 Presionar el botón Guardar CSV y elegir una ubicación. El archivo se guarda con extensión .csv y puede abrirse con Excel, Google Sheets, etc.

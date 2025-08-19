@@ -135,7 +135,7 @@ public class GUI extends JFrame {
             }
         });
 
-        // Validación en tiempo real (opcional simple)
+        // Validación en tiempo real
         DocumentListener docListener = new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { validar(); }
             public void removeUpdate(DocumentEvent e)  { validar(); }
