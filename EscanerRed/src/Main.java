@@ -1,10 +1,13 @@
-import javax.swing.SwingUtilities;
 
 public class Main {
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
+        // Abrir GUI normalmente
+        javax.swing.SwingUtilities.invokeLater(() -> {
             GUI ventana = new GUI();
             ventana.setVisible(true);
         });
+
+        // (Opcional) Probar netstat en consola
+        // Utils.mostrarNetstat();
     }
 }

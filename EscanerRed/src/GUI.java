@@ -1,5 +1,7 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -13,6 +15,7 @@ public class GUI extends JFrame {
     private JButton btnEscanear;
     private JButton btnLimpiar;
     private JButton btnGuardar;
+    private JButton btnNetstat;
     private JTable tablaResultados;
     private JProgressBar barraProgreso;
     private DefaultTableModel modeloTabla;
@@ -22,14 +25,14 @@ public class GUI extends JFrame {
 
     public GUI() {
         setTitle("Escáner de Red");
-        setSize(700, 450);
+        setSize(800, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         scanner = new RedScanner();
 
         // Panel superior con inputs
-        JPanel panelSuperior = new JPanel(new GridLayout(3, 4, 5, 5));
+        JPanel panelSuperior = new JPanel(new GridLayout(3, 5, 5, 5));
         panelSuperior.add(new JLabel("IP Inicio:"));
         txtInicio = new JTextField("10.160.25.1");
         panelSuperior.add(txtInicio);
@@ -45,15 +48,17 @@ public class GUI extends JFrame {
         btnEscanear = new JButton("Escanear");
         btnLimpiar = new JButton("Limpiar");
         btnGuardar = new JButton("Guardar CSV");
+        btnNetstat = new JButton("Netstat");
 
         panelSuperior.add(btnEscanear);
         panelSuperior.add(btnLimpiar);
         panelSuperior.add(btnGuardar);
+        panelSuperior.add(btnNetstat);
 
         // Tabla de resultados
         modeloTabla = new DefaultTableModel(new Object[]{"IP", "Nombre", "Estado", "Tiempo (ms)"}, 0);
         tablaResultados = new JTable(modeloTabla);
-        tablaResultados.setAutoCreateRowSorter(true); // permite ordenar clickeando
+        tablaResultados.setAutoCreateRowSorter(true);
 
         // Barra de progreso
         barraProgreso = new JProgressBar();
@@ -75,13 +80,12 @@ public class GUI extends JFrame {
                 return;
             }
 
-            btnEscanear.setEnabled(false);   // Desactivar mientras trabaja
+            btnEscanear.setEnabled(false);
             barraProgreso.setValue(0);
             tablaResultados.clearSelection();
 
             new Thread(() -> {
-                int timeout = Integer.parseInt(comboTimeout.getSelectedItem().toString()); // (no usado por ping Windows pero listo para usar si se extiende)
-
+                int timeout = Integer.parseInt(comboTimeout.getSelectedItem().toString()); // reservado para futuro
                 resultadosGlobales = scanner.escanearRango(inicio, fin);
 
                 barraProgreso.setMaximum(resultadosGlobales.size());
@@ -133,6 +137,35 @@ public class GUI extends JFrame {
                 scanner.guardarResultadosCSV(resultadosGlobales, ruta);
                 JOptionPane.showMessageDialog(this, "Archivo CSV guardado en:\n" + ruta);
             }
+        });
+
+        // Acción Netstat
+        btnNetstat.addActionListener((ActionEvent e) -> {
+            new Thread(() -> {
+                try {
+                    ProcessBuilder builder = new ProcessBuilder("netstat", "-ano");
+                    Process proceso = builder.start();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
+                    StringBuilder salida = new StringBuilder();
+                    String linea;
+                    while ((linea = reader.readLine()) != null) {
+                        salida.append(linea).append("\n");
+                    }
+                    proceso.waitFor();
+
+                    JTextArea area = new JTextArea(salida.toString());
+                    area.setEditable(false);
+                    JScrollPane scroll = new JScrollPane(area);
+                    scroll.setPreferredSize(new Dimension(700, 400));
+
+                    JOptionPane.showMessageDialog(this, scroll, "Resultados Netstat", JOptionPane.INFORMATION_MESSAGE);
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error ejecutando netstat: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }).start();
         });
 
         // Validación en tiempo real
