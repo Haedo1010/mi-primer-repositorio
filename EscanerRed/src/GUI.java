@@ -15,7 +15,9 @@ public class GUI extends JFrame {
     private JButton btnEscanear;
     private JButton btnLimpiar;
     private JButton btnGuardar;
-    private JButton btnNetstat;
+    private JButton btnNetstatConex;
+    private JButton btnNetstatStats;
+    private JButton btnNetstatRutas;
     private JTable tablaResultados;
     private JProgressBar barraProgreso;
     private DefaultTableModel modeloTabla;
@@ -24,15 +26,15 @@ public class GUI extends JFrame {
     private List<HostInfo> resultadosGlobales;
 
     public GUI() {
-        setTitle("Escáner de Red");
-        setSize(800, 500);
+        setTitle("Escaner de Red");
+        setSize(1000, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         scanner = new RedScanner();
 
         // Panel superior con inputs
-        JPanel panelSuperior = new JPanel(new GridLayout(3, 5, 5, 5));
+        JPanel panelSuperior = new JPanel(new GridLayout(3, 7, 5, 5));
         panelSuperior.add(new JLabel("IP Inicio:"));
         txtInicio = new JTextField("10.160.25.1");
         panelSuperior.add(txtInicio);
@@ -48,12 +50,16 @@ public class GUI extends JFrame {
         btnEscanear = new JButton("Escanear");
         btnLimpiar = new JButton("Limpiar");
         btnGuardar = new JButton("Guardar CSV");
-        btnNetstat = new JButton("Netstat");
+        btnNetstatConex = new JButton("Netstat Conexiones");
+        btnNetstatStats = new JButton("Netstat Estadisticas");
+        btnNetstatRutas = new JButton("Netstat Rutas");
 
         panelSuperior.add(btnEscanear);
         panelSuperior.add(btnLimpiar);
         panelSuperior.add(btnGuardar);
-        panelSuperior.add(btnNetstat);
+        panelSuperior.add(btnNetstatConex);
+        panelSuperior.add(btnNetstatStats);
+        panelSuperior.add(btnNetstatRutas);
 
         // Tabla de resultados
         modeloTabla = new DefaultTableModel(new Object[]{"IP", "Nombre", "Estado", "Tiempo (ms)"}, 0);
@@ -76,7 +82,7 @@ public class GUI extends JFrame {
             String fin = txtFin.getText();
 
             if (!Utils.validarIP(inicio) || !Utils.validarIP(fin)) {
-                JOptionPane.showMessageDialog(this, "Por favor ingrese IPs válidas.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Por favor ingrese IPs validas.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -85,7 +91,7 @@ public class GUI extends JFrame {
             tablaResultados.clearSelection();
 
             new Thread(() -> {
-                int timeout = Integer.parseInt(comboTimeout.getSelectedItem().toString()); // reservado para futuro
+                int timeout = Integer.parseInt(comboTimeout.getSelectedItem().toString()); // reservado para mejoras futuras
                 resultadosGlobales = scanner.escanearRango(inicio, fin);
 
                 barraProgreso.setMaximum(resultadosGlobales.size());
@@ -124,7 +130,7 @@ public class GUI extends JFrame {
         // Acción Guardar CSV
         btnGuardar.addActionListener((ActionEvent e) -> {
             if (resultadosGlobales == null || resultadosGlobales.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No hay resultados para guardar.", "Atención", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "No hay resultados para guardar.", "Atencion", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             JFileChooser chooser = new JFileChooser();
@@ -139,33 +145,19 @@ public class GUI extends JFrame {
             }
         });
 
-        // Acción Netstat
-        btnNetstat.addActionListener((ActionEvent e) -> {
-            new Thread(() -> {
-                try {
-                    ProcessBuilder builder = new ProcessBuilder("netstat", "-ano");
-                    Process proceso = builder.start();
+        // Acción Netstat Conexiones
+        btnNetstatConex.addActionListener((ActionEvent e) -> {
+            ejecutarNetstat(new String[]{"netstat", "-ano"}, "Conexiones activas (netstat -ano)", 700, 400);
+        });
 
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
-                    StringBuilder salida = new StringBuilder();
-                    String linea;
-                    while ((linea = reader.readLine()) != null) {
-                        salida.append(linea).append("\n");
-                    }
-                    proceso.waitFor();
+        // Acción Netstat Estadísticas
+        btnNetstatStats.addActionListener((ActionEvent e) -> {
+            ejecutarNetstat(new String[]{"netstat", "-e"}, "Estadisticas de red (netstat -e)", 500, 300);
+        });
 
-                    JTextArea area = new JTextArea(salida.toString());
-                    area.setEditable(false);
-                    JScrollPane scroll = new JScrollPane(area);
-                    scroll.setPreferredSize(new Dimension(700, 400));
-
-                    JOptionPane.showMessageDialog(this, scroll, "Resultados Netstat", JOptionPane.INFORMATION_MESSAGE);
-
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Error ejecutando netstat: " + ex.getMessage(),
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }).start();
+        // Acción Netstat Rutas
+        btnNetstatRutas.addActionListener((ActionEvent e) -> {
+            ejecutarNetstat(new String[]{"netstat", "-r"}, "Tabla de enrutamiento (netstat -r)", 700, 400);
         });
 
         // Validación en tiempo real
@@ -182,5 +174,34 @@ public class GUI extends JFrame {
         };
         txtInicio.getDocument().addDocumentListener(docListener);
         txtFin.getDocument().addDocumentListener(docListener);
+    }
+
+    // Método auxiliar para ejecutar cualquier comando netstat
+    private void ejecutarNetstat(String[] comando, String titulo, int ancho, int alto) {
+        new Thread(() -> {
+            try {
+                ProcessBuilder builder = new ProcessBuilder(comando);
+                Process proceso = builder.start();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
+                StringBuilder salida = new StringBuilder();
+                String linea;
+                while ((linea = reader.readLine()) != null) {
+                    salida.append(linea).append("\n");
+                }
+                proceso.waitFor();
+
+                JTextArea area = new JTextArea(salida.toString());
+                area.setEditable(false);
+                JScrollPane scroll = new JScrollPane(area);
+                scroll.setPreferredSize(new Dimension(ancho, alto));
+
+                JOptionPane.showMessageDialog(this, scroll, titulo, JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error ejecutando netstat: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }).start();
     }
 }
