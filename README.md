@@ -23,6 +23,34 @@ Este proyecto es una herramienta creada en Java que permite escanear un rango de
 
 ---
 
+## Nuevas funcionalidades (Netstat)
+
+Ahora incluye 3 funciones de Netstat que permiten consultar el estado de la red directamente desde la interfaz gráfica:
+
+Netstat Conexiones (netstat -ano)
+    Muestra todas las conexiones activas en el equipo (local, remota, estado de la conexión y PID del proceso asociado).
+
+Netstat Estadísticas (netstat -e)
+    Muestra estadísticas generales de red (bytes enviados y recibidos, errores de transmisión, paquetes descartados, etc).
+
+Netstat Rutas (netstat -r)
+    Muestra la tabla de enrutamiento de la red, incluyendo las rutas disponibles, máscaras de subred y gateways configurados.
+
+---
+
+## Cómo usar las funciones de Netstat
+
+Al ejecutar el programa, en la parte superior de la ventana encontrarás tres nuevos botones:
+    - Netstat Conexiones.
+    - Netstat Estadísticas.
+    - Netstat Rutas.
+
+Al presionar cualquiera de ellos se abrirá una ventana emergente con los resultados del comando correspondiente.
+
+El contenido se muestra en un cuadro desplazable para facilitar la lectura.
+
+---
+
 ## Estructura del código
 
 | Clase       | Descripción                                                         |
